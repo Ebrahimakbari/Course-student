@@ -42,12 +42,12 @@ class Student(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     email = models.EmailField()
-    national_id = models.IntegerField()
-    phone_number = models.CharField(max_length=20, null=True, blank=True)
+    national_id = models.CharField(max_length=10)
+    phone_number = models.CharField(max_length=11, null=True, blank=True)
     major = models.CharField(max_length=100)
     year = models.DateField(auto_now_add=True)
     max_units = models.IntegerField(default=20)
-    student_number = models.CharField(max_length=20, unique=True)
+    student_number = models.CharField(max_length=9, unique=True)
     admission_year = models.IntegerField()
     
     def __str__(self):

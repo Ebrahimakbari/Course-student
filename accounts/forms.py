@@ -1,5 +1,4 @@
 from django import forms
-from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 from .models import CustomUser as User
 from .models import Student
@@ -10,12 +9,6 @@ from .models import Student
 class StudentRegistrationForm(forms.Form):
     student_number = forms.CharField(
         label='شماره دانشجویی',
-        validators=[
-            RegexValidator(
-                regex='^[0-9]{8,10}$',
-                message='شماره دانشجویی باید بین 8 تا 10 رقم باشد'
-            )
-        ]
     )
     first_name = forms.CharField(label='نام')
     last_name = forms.CharField(label='نام خانوادگی')
@@ -30,12 +23,20 @@ class StudentRegistrationForm(forms.Form):
         student_number = self.cleaned_data.get('student_number')
         if User.objects.filter(student_number=student_number).exists():
             raise forms.ValidationError('این شماره دانشجویی قبلاً ثبت شده است')
+        elif not student_number:
+            raise forms.ValidationError("شماره دانشجویی نمی تواند خالی باشد.")
+        elif not str(student_number).isdigit() or len(str(student_number)) != 9:
+            raise forms.ValidationError("شماره دانشجویی باید 9 رقم باشد و تنها شامل اعداد باشد.")
         return student_number
 
     def clean_national_id(self):
         national_id = self.cleaned_data.get('national_id')
         if Student.objects.filter(national_id=national_id).exists():
             raise forms.ValidationError('این شماره ملی قبلاً ثبت شده است')
+        elif not national_id:
+            raise forms.ValidationError("شماره ملی نمی تواند خالی باشد.")
+        elif not str(national_id).isdigit() or len(str(national_id)) != 10:
+            raise forms.ValidationError("شماره ملی باید 10 رقم باشد و تنها شامل اعداد باشد.")
         return national_id
     
     def clean_email(self):
@@ -70,6 +71,14 @@ class StudentLoginForm(forms.Form):
             cleaned_data['user'] = user
         return cleaned_data
 
+    def clean_student_number(self):
+        student_number = self.cleaned_data.get('student_number')
+        if not student_number:
+            raise forms.ValidationError("شماره دانشجویی نمی تواند خالی باشد.")
+        elif not str(student_number).isdigit() or len(str(student_number)) != 9:
+            raise forms.ValidationError("شماره دانشجویی باید 9 رقم باشد و تنها شامل اعداد باشد.")
+        return student_number
+    
 
 class PasswordResetVerifyForm(forms.Form):
     student_number = forms.CharField(
@@ -97,6 +106,14 @@ class PasswordResetVerifyForm(forms.Form):
             
             cleaned_data['user'] = user
         return cleaned_data
+
+    def clean_student_number(self):
+        student_number = self.cleaned_data.get('student_number')
+        if not student_number:
+            raise forms.ValidationError("شماره دانشجویی نمی تواند خالی باشد.")
+        elif not str(student_number).isdigit() or len(str(student_number)) != 9:
+            raise forms.ValidationError("شماره دانشجویی باید 9 رقم باشد و تنها شامل اعداد باشد.")
+        return student_number
 
 
 class PasswordResetForm(forms.Form):

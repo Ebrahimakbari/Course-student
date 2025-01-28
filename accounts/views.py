@@ -42,15 +42,16 @@ class StudentRegistrationView(View):
             return redirect('login')
         return render(request, self.template_name, {'form': form})
 
+
 class StudentLoginView(View):
     template_name = 'accounts/login.html'
-
+    
     def get(self, request):
         if request.user.is_authenticated:
             return redirect('dashboard')
         form = StudentLoginForm()
         return render(request, self.template_name, {'form': form})
-
+    
     def post(self, request):
         form = StudentLoginForm(request.POST)
         if form.is_valid():
@@ -65,7 +66,7 @@ class LogoutView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             logout(request)
-            messages.success(request, 'logout successfully!')
+            messages.success(request, 'با موفقییت خارج شدید!!')
             return redirect('login')
 
 
@@ -79,6 +80,7 @@ class PasswordResetView(View):
         form = PasswordResetVerifyForm()
         return render(request, 'accounts/password_reset_verify.html', {'form': form})
 
+
     def post(self, request):
         # اگر کاربر قبلاً احراز هویت شده، رمز جدید را ثبت کن
         if 'reset_verified_user_id' in request.session:
@@ -91,9 +93,7 @@ class PasswordResetView(View):
                 del request.session['reset_verified_user_id']
                 messages.success(request, 'رمز عبور با موفقیت تغییر کرد')
                 return redirect('login')
-            
             return render(request, 'accounts/password_reset_new.html', {'form': form})
-        
         # در غیر این صورت اطلاعات کاربر را تأیید کن
         form = PasswordResetVerifyForm(request.POST)
         if form.is_valid():
@@ -101,6 +101,5 @@ class PasswordResetView(View):
             request.session['reset_verified_user_id'] = user.id
             # نمایش فرم تغییر رمز
             return redirect('password_reset')
-        
         return render(request, 'accounts/password_reset_verify.html', {'form': form})
 
