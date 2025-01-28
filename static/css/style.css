@@ -1,0 +1,17 @@
+.signup-container {
+    max-width: fit-content;
+    margin: auto;
+    padding-top: 40px;
+}
+
+.login-container {
+    max-width: fit-content;
+    margin: auto;
+    padding-top: 40px;
+}
+
+.password-reset-container {
+    max-width: fit-content;
+    margin: auto;
+    padding-top: 40px;
+}
