@@ -10,10 +10,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 
+
+
 class StudentRegistrationView(View):
     template_name = 'accounts/register.html'
 
     def get(self, request):
+        if request.user.is_authenticated:
+            return redirect('student_profile')
         form = StudentRegistrationForm()
         return render(request, self.template_name, {'form': form})
 
@@ -48,7 +52,7 @@ class StudentLoginView(View):
     
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect('dashboard')
+            return redirect('student_profile')
         form = StudentLoginForm()
         return render(request, self.template_name, {'form': form})
     
@@ -57,7 +61,7 @@ class StudentLoginView(View):
         if form.is_valid():
             user = form.cleaned_data['user']
             login(request, user)
-            next_url = request.GET.get('next', 'dashboard')
+            next_url = request.GET.get('next', 'student_profile')
             return redirect(next_url)
         return render(request, self.template_name, {'form': form})
 

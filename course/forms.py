@@ -1,5 +1,6 @@
 from django import forms
 from accounts.models import Student
+from .models import Department, Course, Enrollment
 
 
 class StudentProfileForm(forms.ModelForm):
@@ -27,3 +28,23 @@ class StudentProfileForm(forms.ModelForm):
             raise forms.ValidationError("شماره تماس باید ۱۱ رقم باشد و تنها شامل اعداد باشد.")
         return phone_number
 
+
+
+class CourseSelectionForm(forms.Form):
+    department = forms.ModelChoiceField(
+        queryset=Department.objects.all(),
+        empty_label="دانشکده را انتخاب کنید",
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'id': 'department-select'
+        }),
+        label="دانشکده"
+    )
+
+class EnrollmentForm(forms.ModelForm):
+    class Meta:
+        model = Enrollment
+        fields = ['course']
+        widgets = {
+            'course': forms.HiddenInput()
+        }
