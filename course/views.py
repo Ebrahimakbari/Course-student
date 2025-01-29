@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import StudentProfileForm, CourseSelectionForm
 from accounts.models import Student
-from .models import Course
+from .models import Course, Enrollment, WeeklySchedule
 from .services import EnrollmentService
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -111,6 +111,61 @@ def enroll_course(request):
             'message': 'درس مورد نظر یافت نشد.'
         }, status=404)
     except ValidationError as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=400)
+
+
+@login_required
+@require_POST
+def drop_course(request):
+    course_id = request.POST.get('course_id')
+    try:
+        course = Course.objects.get(id=course_id)
+        student = Student.objects.get(user=request.user)
+        enrollment = Enrollment.objects.get(student=student, course=course)
+        
+        # افزایش ظرفیت درس
+        course.capacity += 1
+        course.save()
+        
+        # حذف از برنامه هفتگی
+        WeeklySchedule.objects.filter(student=student, course=course).delete()
+        
+        # حذف ثبت‌نام
+        enrollment.delete()
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': f'درس {course.name} با موفقیت حذف شد.'
+        })
+        
+    except (Course.DoesNotExist, Enrollment.DoesNotExist):
+        return JsonResponse({
+            'status': 'error',
+            'message': 'درس مورد نظر یافت نشد.'
+        }, status=404)
+
+@login_required
+def get_enrolled_courses(request):
+    try:
+        student = Student.objects.get(user=request.user)
+        enrolled_courses = Enrollment.objects.filter(
+            student=student,
+            status='approved'
+        ).select_related('course', 'course__instructor')
+        
+        courses_data = [{
+            'id': enrollment.course.id,
+            'name': enrollment.course.name,
+            'code': enrollment.course.code,
+            'credits': enrollment.course.credits,
+            'instructor': f"{enrollment.course.instructor.first_name} {enrollment.course.instructor.last_name}"
+        } for enrollment in enrolled_courses]
+        
+        return JsonResponse({'status': 'success', 'courses': courses_data})
+    except Exception as e:
         return JsonResponse({
             'status': 'error',
             'message': str(e)

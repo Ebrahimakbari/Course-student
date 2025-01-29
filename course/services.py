@@ -24,14 +24,6 @@ class EnrollmentService:
         return queryset
     
     @staticmethod
-    def check_unit_limit(student, course):
-        """بررسی محدودیت واحد"""
-        total_units = EnrollmentService.calculate_total_units(student)
-        if total_units + course.credits > student.max_units:
-            raise ValidationError(f"تعداد واحدها از حداکثر مجاز ({student.max_units}) بیشتر می‌شود")
-    
-    
-    @staticmethod
     def validate_course_conflicts(student, course):
         # بررسی تداخل زمانی کلاس‌ها
         student_courses = Enrollment.objects.filter(
