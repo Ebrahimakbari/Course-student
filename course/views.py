@@ -1,3 +1,4 @@
+import json
 from django.forms import ValidationError
 from django.views import View
 from django.shortcuts import render, redirect
@@ -5,12 +6,14 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import StudentProfileForm, CourseSelectionForm
 from accounts.models import Student
-from .models import Course, Enrollment, WeeklySchedule
+from .models import Classroom, Course, CourseClassroom, CourseSchedule, Enrollment, WeeklySchedule
 from .services import EnrollmentService
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.core.exceptions import ValidationError
+from django.db.models import Min, Max
+
 
 
 
@@ -81,10 +84,32 @@ def get_department_courses(request):
         courses = Course.objects.filter(
             department_id=department_id,
             capacity__gt=0
-        ).values('id', 'name', 'code', 'credits', 'instructor__first_name',
-                'instructor__last_name', 'capacity', 'initial_capacity')
-        return JsonResponse({'courses': list(courses)})
+        ).prefetch_related('schedules').values(
+            'id', 'name', 'code', 'credits', 'instructor__first_name',
+            'instructor__last_name', 'capacity', 'initial_capacity', 'exam_date'
+        )
+
+        # افزودن روز و زمان ارائه هر درس
+        courses_data = []
+        for course in courses:
+            schedules = CourseSchedule.objects.filter(course_id=course['id']).values('day_of_week', 'start_time', 'end_time')
+            schedules_list = [
+                {
+                    'day': dict(CourseSchedule.DAYS_OF_WEEK)[s['day_of_week']],
+                    'start_time': s['start_time'].strftime('%H:%M'),
+                    'end_time': s['end_time'].strftime('%H:%M'),
+                } for s in schedules
+            ]
+
+            courses_data.append({
+                **course,
+                'schedules': schedules_list,
+                'exam_date': course['exam_date'].strftime('%Y-%m-%d') if course['exam_date'] else 'نامشخص'
+            })
+
+        return JsonResponse({'courses': courses_data})
     return JsonResponse({'courses': []})
+
 
 
 @login_required
@@ -156,6 +181,8 @@ def get_enrolled_courses(request):
             status='approved'
         ).select_related('course', 'course__instructor')
         
+        total_units = EnrollmentService.calculate_total_units(student)
+        
         courses_data = [{
             'id': enrollment.course.id,
             'name': enrollment.course.name,
@@ -164,9 +191,51 @@ def get_enrolled_courses(request):
             'instructor': f"{enrollment.course.instructor.first_name} {enrollment.course.instructor.last_name}"
         } for enrollment in enrolled_courses]
         
-        return JsonResponse({'status': 'success', 'courses': courses_data})
+        return JsonResponse({
+            'status': 'success', 
+            'courses': courses_data,
+            'total_units': total_units,
+            'max_units': student.max_units
+        })
     except Exception as e:
         return JsonResponse({
             'status': 'error',
             'message': str(e)
         }, status=400)
+
+
+@login_required
+def weekly_schedule_view(request):
+    try:
+        student = Student.objects.get(user=request.user)
+        schedules = WeeklySchedule.objects.filter(student=student)\
+            .select_related('course', 'course__instructor')\
+            .order_by('day_of_week', 'start_time')
+
+        # ساخت بازه‌های زمانی بر اساس کلاس‌ها
+        unique_time_slots = sorted(set((schedule.start_time.strftime('%H:%M'), schedule.end_time.strftime('%H:%M')) for schedule in schedules))
+
+        schedules_data = []
+        for schedule in schedules:
+            schedules_data.append({
+                'day_of_week': schedule.day_of_week,
+                'start_time': schedule.start_time.strftime('%H:%M'),
+                'end_time': schedule.end_time.strftime('%H:%M'),
+                'course': {
+                    'name': schedule.course.name,
+                    'code': schedule.course.code,
+                    'instructor': f"{schedule.course.instructor.first_name} {schedule.course.instructor.last_name}",
+                    'classroom': CourseClassroom.objects.get(course=schedule.course).classroom.name if schedule.course else '',
+                    'exam_date': schedule.course.exam_date.strftime('%Y-%m-%d') if schedule.course.exam_date else 'نامشخص'
+                }
+            })
+
+        context = {
+            'schedules': json.dumps(schedules_data, ensure_ascii=False),
+            'time_slots': [f"{start} - {end}" for start, end in unique_time_slots],
+            'days': WeeklySchedule.DAYS_OF_WEEK,
+        }
+        return render(request, 'course/weekly_schedule.html', context)
+    except Student.DoesNotExist:
+        messages.error(request, 'پروفایل دانشجویی یافت نشد')
+        return redirect('home')

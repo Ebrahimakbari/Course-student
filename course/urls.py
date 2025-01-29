@@ -10,5 +10,7 @@ urlpatterns = [
     path('get-enrolled-courses/', views.get_enrolled_courses, name='get_enrolled_courses'),
     path('enroll-course/', views.enroll_course, name='enroll_course'),
     path('get-department-courses/', views.get_department_courses, name='get_department_courses'),
+    path('weekly-schedule/', views.weekly_schedule_view, name='weekly_schedule'),
+
 ]
 

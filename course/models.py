@@ -52,6 +52,14 @@ class Classroom(models.Model):
         return self.name
 
 
+class CourseClassroom(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_classroom')
+    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return f"{self.course.name} = {self.classroom.name}"
+
+
 class Prerequisite(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='prerequisites')
     required_course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='is_prerequisite_for')

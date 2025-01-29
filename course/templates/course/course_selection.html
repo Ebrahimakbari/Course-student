@@ -27,6 +27,20 @@
             </table>
         </div>
     </div>
+
+    <div class="units-info mb-3">
+        <p class="h5">
+            تعداد واحدهای انتخاب شده: 
+            <span id="total-units">0</span>
+            از
+            <span id="max-units">20</span>
+            واحد مجاز
+        </p>
+    </div>
+
+    <div class="mb-3">
+        <input type="text" id="search-input" class="form-control" placeholder="جستجو بر اساس نام یا کد درس..." autocomplete="off">
+    </div>
     
     <!-- فرم انتخاب دانشکده و جدول دروس -->
     <div class="card">
@@ -41,9 +55,11 @@
                         <tr>
                             <th>کد درس</th>
                             <th>نام درس</th>
-                            <th>تعداد واحد</th>
+                            <th>واحد</th>
                             <th>استاد</th>
-                            <th>ظرفیت باقیمانده</th>
+                            <th>ظرفیت</th>
+                            <th>روز و زمان ارائه</th>
+                            <th>تاریخ امتحان</th>
                             <th>عملیات</th>
                         </tr>
                     </thead>

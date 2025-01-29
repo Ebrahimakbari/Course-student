@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Course, Department, Instructor, Classroom, Prerequisite, Corequisite, CourseSchedule, Enrollment, WeeklySchedule
+from .models import CourseClassroom, Course, Department, Instructor, Classroom, Prerequisite, Corequisite, CourseSchedule, Enrollment, WeeklySchedule
 
 # Register your models here.
 
@@ -48,3 +48,8 @@ class EnrollmentAdmin(admin.ModelAdmin):
 class WeeklyScheduleAdmin(admin.ModelAdmin):
     list_display = ('student', 'course', 'get_day_of_week_display', 'start_time', 'end_time')
     list_filter = ('day_of_week', 'student')
+
+
+@admin.register(CourseClassroom)
+class CourseClassroomAdmin(admin.ModelAdmin):
+    list_display = ('course',)

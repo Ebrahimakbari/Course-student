@@ -22,7 +22,17 @@ class EnrollmentService:
         if status:
             queryset = queryset.filter(status=status)
         return queryset
-    
+
+    @staticmethod
+    def validate_max_units(student, course):
+        """بررسی تعداد واحدهای مجاز"""
+        current_units = EnrollmentService.calculate_total_units(student)
+        if current_units + course.credits > student.max_units:
+            raise ValidationError(
+                f'تعداد واحدهای انتخابی ({current_units + course.credits}) '
+                f'از سقف مجاز ({student.max_units}) بیشتر است'
+            )
+
     @staticmethod
     def validate_course_conflicts(student, course):
         # بررسی تداخل زمانی کلاس‌ها
@@ -69,7 +79,7 @@ class EnrollmentService:
                     student=student.id, course=prereq.required_course, status="approved"
                 ).exists():
                     raise ValidationError(
-                        f"پیش‌نیاز {prereq.required_course.name} را نگذرانده‌اید"
+                        f'این درس --{prereq.required_course.name}-- که پیش نیاز هست را نگذرانده اید!!'
                     )
 
     @staticmethod
@@ -113,6 +123,9 @@ class EnrollmentService:
         # بررسی ظرفیت
         if course.capacity <= 0:
             raise ValidationError("ظرفیت درس تکمیل شده است")
+        
+        # بررسی تعداد واحدها
+        EnrollmentService.validate_max_units(student, course)
 
         # بررسی تداخل‌ها
         EnrollmentService.validate_course_conflicts(student, course)
