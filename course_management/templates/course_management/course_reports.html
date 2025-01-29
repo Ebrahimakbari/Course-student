@@ -1,0 +1,26 @@
+{% extends 'shared/base.html' %}
+
+{% block main %}
+<h1>گزارش دروس</h1>
+<table class="table table-striped table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">نام درس</th>
+            <th scope="col">تعداد دانشجویان ثبت‌نام شده</th>
+            <th scope="col">ظرفیت</th>
+            <th scope="col">ظرفیت اولیه</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for course in course_data %}
+        <tr>
+            <td>{{ course.name }}</td>
+            <td>{{ course.enrolled_students }}</td>
+            <td>{{ course.capacity }}</td>
+            <td>{{ course.initial_capacity }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+

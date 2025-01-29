@@ -1,0 +1,39 @@
+{% extends 'shared/base.html' %}
+
+{% block main %}
+<h1>جزئیات درس: {{ course.name }}</h1>
+<p>کد درس: {{ course.code }}</p>
+<p>تعداد واحد: {{ course.credits }}</p>
+<p>دانشکده: {{ course.department.name }}</p>
+<p>استاد: {{ course.instructor.first_name }} {{ course.instructor.last_name }}</p>
+
+<h2>زمان‌بندی کلاس‌ها</h2>
+<ul>
+    {% for schedule in schedules %}
+    <li>{{ schedule.get_day_of_week_display }}: {{ schedule.start_time }} - {{ schedule.end_time }}</li>
+    {% endfor %}
+</ul>
+
+<h2>پیش‌نیازها</h2>
+<ul>
+    {% for prereq in prerequisites %}
+    <li>
+        {{ prereq.required_course.name }}
+        <a href="{% url 'delete_prerequisite' prereq.id %}" class="btn btn-danger btn-sm">حذف</a>
+    </li>
+    {% endfor %}
+</ul>
+<a href="{% url 'add_prerequisite' course.id %}" class="btn btn-success">افزودن پیشنیاز</a>
+
+<h2>هم‌نیازها</h2>
+<ul>
+    {% for coreq in corequisites %}
+    <li>
+        {{ coreq.required_course.name }}
+        <a href="{% url 'delete_corequisite' coreq.id %}" class="btn btn-danger btn-sm">حذف</a>
+    </li>
+    {% endfor %}
+</ul>
+<a href="{% url 'add_corequisite' course.id %}" class="btn btn-success">افزودن همنیاز</a>
+
+{% endblock %}

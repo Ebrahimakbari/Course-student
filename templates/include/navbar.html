@@ -2,18 +2,35 @@
   <div class="container-fluid">
     <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
       <ul class="navbar-nav mb-2 mb-lg-0">
-        {% if request.user.is_authenticated %}
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="{% url "logout" %}"> خروج</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="{% url 'student_profile' %}"> پروفایل</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="{% url 'course_selection' %}"> انتخاب دروس</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="{% url 'weekly_schedule' %}">  برنامه هفتگی</a>
+        {% if request.user.is_superuser %}
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url "logout" %}"> خروج</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'student_profile' %}"> پروفایل</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'admin_course_management' %}"> مدیریت دروس</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'course_report' %}"> گرارش دروس</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'user_management' %}"> مدیریت کاربران</a>
+        </li>
+        {% elif request.user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url "logout" %}"> خروج</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'student_profile' %}"> پروفایل</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'course_selection' %}"> انتخاب دروس</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'weekly_schedule' %}">  برنامه هفتگی</a>
+        </li>
           </li>
           {% else %}
           <li class="nav-item">
