@@ -87,6 +87,9 @@ class Prerequisite(models.Model):
     required_course = models.ForeignKey(
         Course, on_delete=models.CASCADE, related_name="is_prerequisite_for"
     )
+    
+    def __str__(self):
+        return f"{self.course.name} perquisite"
 
     class Meta:
         verbose_name = "پیش نیاز"
@@ -102,6 +105,8 @@ class Corequisite(models.Model):
         Course, on_delete=models.CASCADE, related_name="is_corequisite_for"
     )
 
+    def __str__(self):
+        return f"{self.course.name} corequisite"
     class Meta:
         verbose_name = "هم نیاز"
         verbose_name_plural = "هم نیاز ها ها"
@@ -126,6 +131,9 @@ class CourseSchedule(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     classroom = models.ForeignKey("Classroom", on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return f"{self.course.name} {self.day_of_week}"
 
     class Meta:
         verbose_name = "مشخصات درس"
@@ -144,6 +152,9 @@ class Enrollment(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     enrollment_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    
+    def __str__(self):
+        return f"{self.student.first_name} {self.enrollment_date} {self.status}"
 
     class Meta:
         verbose_name = " انتخاب واحد"
@@ -167,6 +178,9 @@ class WeeklySchedule(models.Model):
     day_of_week = models.IntegerField(choices=DAYS_OF_WEEK)
     start_time = models.TimeField()
     end_time = models.TimeField()
+    
+    def __str__(self):
+        return f"{self.student.first_name} {self.day_of_week}"
 
     class Meta:
         verbose_name = "برنامه هفتگی"

@@ -13,6 +13,7 @@ from accounts.models import Student
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
+
 class StudentRegistrationView(View):
     template_name = "accounts/register.html"
 
@@ -25,20 +26,22 @@ class StudentRegistrationView(View):
     def post(self, request):
         form = StudentRegistrationForm(request.POST)
         if form.is_valid():
-            # ایجاد کاربر
+            # Create CustomUser instance
             user = User.objects.create_user(
                 student_number=form.cleaned_data["student_number"],
                 password=form.cleaned_data["password"],
                 email=form.cleaned_data["email"],
+                first_name=form.cleaned_data["first_name"],
+                last_name=form.cleaned_data["last_name"],
             )
-            # ایجاد پروفایل دانشجو
-            Student.objects.create(
+            # Create Student profile
+            student = Student.objects.create(
                 user=user,
+                email=form.cleaned_data["email"],
                 student_number=form.cleaned_data["student_number"],
                 first_name=form.cleaned_data["first_name"],
                 last_name=form.cleaned_data["last_name"],
                 major=form.cleaned_data["major"],
-                email=form.cleaned_data["email"],
                 national_id=form.cleaned_data["national_id"],
                 admission_year=form.cleaned_data["admission_year"],
             )

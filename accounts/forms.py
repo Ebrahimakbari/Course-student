@@ -3,21 +3,34 @@ from django.contrib.auth import authenticate
 from .models import CustomUser as User
 from .models import Student
 
+class StudentRegistrationForm(forms.ModelForm):
+    password = forms.CharField(label="رمز عبور", widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    password_confirm = forms.CharField(label="تکرار رمز عبور", widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
-class StudentRegistrationForm(forms.Form):
-    student_number = forms.CharField(
-        label="شماره دانشجویی",
-    )
-    first_name = forms.CharField(label="نام")
-    last_name = forms.CharField(label="نام خانوادگی")
-    major = forms.CharField(label="رشته تحصیلی", required=True)
-    email = forms.EmailField(label="ایمیل")
-    national_id = forms.IntegerField(label="شماره ملی")
-    admission_year = forms.IntegerField(label="سال ورود")
-    password = forms.CharField(label="رمز عبور", widget=forms.PasswordInput)
-    password_confirm = forms.CharField(
-        label="تکرار رمز عبور", widget=forms.PasswordInput
-    )
+    class Meta:
+        model = Student
+        fields = [
+            'student_number', 'first_name', 'last_name', 'major',
+            'email', 'national_id', 'admission_year'
+        ]
+        labels = {
+            'student_number': 'شماره دانشجویی',
+            'first_name': 'نام',
+            'last_name': 'نام خانوادگی',
+            'major': 'رشته تحصیلی',
+            'email': 'ایمیل',
+            'national_id': 'شماره ملی',
+            'admission_year': 'سال ورود',
+        }
+        widgets = {
+            'student_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'major': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'national_id': forms.TextInput(attrs={'class': 'form-control'}),
+            'admission_year': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
 
     def clean_student_number(self):
         student_number = self.cleaned_data.get("student_number")
@@ -37,10 +50,10 @@ class StudentRegistrationForm(forms.Form):
             raise forms.ValidationError("این شماره ملی قبلاً ثبت شده است")
         elif not national_id:
             raise forms.ValidationError("شماره ملی نمی تواند خالی باشد.")
-        elif not str(national_id).isdigit() or len(str(national_id)) != 10:
-            raise forms.ValidationError(
-                "شماره ملی باید 10 رقم باشد و تنها شامل اعداد باشد."
-            )
+        elif not str(national_id).isdigit():
+            raise forms.ValidationError("شماره ملی باید تنها شامل اعداد باشد.")
+        elif len(str(national_id)) != 10:
+            raise forms.ValidationError("شماره ملی باید 10 رقم باشد.")
         return national_id
 
     def clean_email(self):
@@ -58,6 +71,12 @@ class StudentRegistrationForm(forms.Form):
             raise forms.ValidationError("رمز عبور و تکرار آن باید یکسان باشند")
         return cleaned_data
 
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password"])
+        if commit:
+            user.save()
+        return user
 
 class StudentLoginForm(forms.Form):
     student_number = forms.CharField(label="شماره دانشجویی")

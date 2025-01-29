@@ -33,7 +33,7 @@
                 </div>
                 <div class="row mb-2">
                     <div class="col-md-3 font-weight-bold">شماره تماس:</div>
-                    <div class="col-md-9">{{ student.phone_number }}</div>
+                    <div class="col-md-9">{% if student.phone_number %}{{ student.phone_number }}{% endif %}</div>
                 </div>
                 <div class="row mb-2">
                     <div class="col-md-3 font-weight-bold">رشته تحصیلی:</div>
