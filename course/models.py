@@ -20,6 +20,10 @@ class Course(models.Model):
     def __str__(self):
         return f"{self.code} - {self.name}"
     
+    class Meta:
+        verbose_name = 'درس'
+        verbose_name_plural = 'درس ها'
+    
     def get_all_corequisites(self):
         """Returns all corequisite courses"""
         return Course.objects.filter(
@@ -29,6 +33,10 @@ class Course(models.Model):
 class Department(models.Model):
     name = models.CharField(max_length=100)
     
+    class Meta:
+        verbose_name = 'نام دانشکده'
+        verbose_name_plural = 'نام دانشکده ها'
+        
     def __str__(self):
         return self.name
 
@@ -39,6 +47,10 @@ class Instructor(models.Model):
     last_name = models.CharField(max_length=50)
     email = models.EmailField()
     
+    class Meta:
+        verbose_name = 'مدرس'
+        verbose_name_plural = 'مدرس ها'
+
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
     
@@ -47,7 +59,11 @@ class Classroom(models.Model):
     name = models.CharField(max_length=100)
     capacity = models.IntegerField()
     department = models.ForeignKey(Department, on_delete=models.PROTECT)
-    
+
+    class Meta:
+        verbose_name = 'کلاس'
+        verbose_name_plural = 'کلاس ها'
+        
     def __str__(self):
         return self.name
 
@@ -56,6 +72,10 @@ class CourseClassroom(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_classroom')
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
     
+    class Meta:
+        verbose_name = 'کلاس درس'
+        verbose_name_plural = 'کلاس درس ها'
+    
     def __str__(self):
         return f"{self.course.name} = {self.classroom.name}"
 
@@ -63,15 +83,19 @@ class CourseClassroom(models.Model):
 class Prerequisite(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='prerequisites')
     required_course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='is_prerequisite_for')
-    
+
     class Meta:
+        verbose_name = 'پیش نیاز'
+        verbose_name_plural = 'پیش نیاز ها'
         unique_together = ['course', 'required_course']
 
 class Corequisite(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='corequisites')
     required_course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='is_corequisite_for')
-    
+            
     class Meta:
+        verbose_name = 'هم نیاز'
+        verbose_name_plural = 'هم نیاز ها ها'
         unique_together = ['course', 'required_course']
 
 class CourseSchedule(models.Model):
@@ -92,6 +116,8 @@ class CourseSchedule(models.Model):
     classroom = models.ForeignKey('Classroom', on_delete=models.CASCADE)
     
     class Meta:
+        verbose_name = 'مشخصات درس'
+        verbose_name_plural = 'مشخصات درس ها'
         unique_together = ['course', 'day_of_week', 'start_time']
 
 class Enrollment(models.Model):
@@ -107,6 +133,8 @@ class Enrollment(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     
     class Meta:
+        verbose_name = ' انتخاب واحد'
+        verbose_name_plural = '  انتخاب واحد درس ها'
         unique_together = ['student', 'course']
 
 class WeeklySchedule(models.Model):
@@ -127,4 +155,6 @@ class WeeklySchedule(models.Model):
     end_time = models.TimeField()
     
     class Meta:
+        verbose_name = 'برنامه هفتگی'
+        verbose_name_plural = 'برنامه های هفتگی '
         unique_together = ['student', 'course', 'day_of_week']

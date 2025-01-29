@@ -28,11 +28,19 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = ['email']
     
     objects = CustomUserManager()
+    
+    class Meta:
+        verbose_name = 'کاربر'
+        verbose_name_plural = 'کاربر ها'
 
 
 class UserLevel(models.Model):
     name = models.CharField(max_length=50)
-    
+
+    class Meta:
+        verbose_name = 'سطح کاربر '
+        verbose_name_plural = 'سطح های کاربر '
+        
     def __str__(self):
         return self.name
 
@@ -52,3 +60,7 @@ class Student(models.Model):
     
     def __str__(self):
         return f"{self.student_number} - {self.first_name} {self.last_name}"
+    
+    class Meta:
+        verbose_name = 'دانشجو'
+        verbose_name_plural = 'دانشجو ها'

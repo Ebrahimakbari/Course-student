@@ -6,13 +6,12 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import StudentProfileForm, CourseSelectionForm
 from accounts.models import Student
-from .models import Classroom, Course, CourseClassroom, CourseSchedule, Enrollment, WeeklySchedule
+from .models import Course, CourseClassroom, CourseSchedule, Enrollment, WeeklySchedule
 from .services import EnrollmentService
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.core.exceptions import ValidationError
-from django.db.models import Min, Max
 
 
 
