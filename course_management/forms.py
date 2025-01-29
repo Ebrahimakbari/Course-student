@@ -1,7 +1,7 @@
 # forms.py
 from django import forms
 from accounts.models import CustomUser, Student
-from course.models import Course, CourseSchedule, Prerequisite, Corequisite
+from course.models import Course, CourseClassroom, CourseSchedule, Prerequisite, Corequisite
 
 
 
@@ -125,4 +125,16 @@ class CorequisiteForm(forms.ModelForm):
         }
         widgets = {
             'required_course': forms.Select(attrs={'class': 'form-control'}),
+        }
+    
+
+class CourseClassroomForm(forms.ModelForm):
+    class Meta:
+        model = CourseClassroom
+        fields = ['classroom']
+        labels = {
+            'classroom': 'کلاس',
+        }
+        widgets = {
+            'classroom': forms.Select(attrs={'class': 'form-control'}),
         }

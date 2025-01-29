@@ -18,7 +18,7 @@
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="{% url 'user_management' %}"> مدیریت کاربران</a>
         </li>
-        {% elif request.user.is_authenticated %}
+        {% comment %} {% elif request.user.is_authenticated %} {% endcomment %}
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="{% url "logout" %}"> خروج</a>
         </li>

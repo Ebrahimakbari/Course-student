@@ -231,30 +231,33 @@ def weekly_schedule_view(request):
 
         schedules_data = []
         for schedule in schedules:
-            schedules_data.append(
-                {
-                    "day_of_week": schedule.day_of_week,
-                    "start_time": schedule.start_time.strftime("%H:%M"),
-                    "end_time": schedule.end_time.strftime("%H:%M"),
-                    "course": {
-                        "name": schedule.course.name,
-                        "code": schedule.course.code,
-                        "instructor": f"{schedule.course.instructor.first_name} {schedule.course.instructor.last_name}",
-                        "classroom": (
-                            CourseClassroom.objects.get(
-                                course=schedule.course
-                            ).classroom.name
-                            if schedule.course
-                            else ""
-                        ),
-                        "exam_date": (
-                            schedule.course.exam_date.strftime("%Y-%m-%d")
-                            if schedule.course.exam_date
-                            else "نامشخص"
-                        ),
-                    },
-                }
-            )
+            if CourseClassroom.objects.filter(course=schedule.course).exists():
+                schedules_data.append(
+                    {
+                        "day_of_week": schedule.day_of_week,
+                        "start_time": schedule.start_time.strftime("%H:%M"),
+                        "end_time": schedule.end_time.strftime("%H:%M"),
+                        "course": {
+                            "name": schedule.course.name,
+                            "code": schedule.course.code,
+                            "instructor": f"{schedule.course.instructor.first_name} {schedule.course.instructor.last_name}",
+                            "classroom": (
+                                CourseClassroom.objects.get(
+                                    course=schedule.course
+                                ).classroom.name
+                                if schedule.course
+                                else ""
+                            ),
+                            "exam_date": (
+                                schedule.course.exam_date.strftime("%Y-%m-%d")
+                                if schedule.course.exam_date
+                                else "نامشخص"
+                            ),
+                        },
+                    }
+                )
+            else:
+                raise ValidationError('جزییات مربوط به کلاس درس هر درس را پر کنید!!')
 
         context = {
             "schedules": json.dumps(schedules_data, ensure_ascii=False),

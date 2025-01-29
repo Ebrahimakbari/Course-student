@@ -9,6 +9,7 @@ urlpatterns = [
     path('management/courses/edit/<int:course_id>/', views.edit_course, name='edit_course'),
     path('management/courses/delete/<int:course_id>/', views.delete_course, name='delete_course'),
     path('management/courses/detail/<int:course_id>/', views.course_detail, name='course_detail'),
+    path('enrollment/<int:enrollment_id>/delete/', views.delete_enrollment, name='delete_enrollment'),
     
     # URL‌های مدیریت زمان‌بندی دروس
     path('management/courses/<int:course_id>/add-schedule/', views.add_course_schedule, name='add_course_schedule'),
@@ -26,4 +27,7 @@ urlpatterns = [
     path('users/add/', views.add_user, name='add_user'),
     path('users/<int:student_id>/edit/', views.edit_user, name='edit_user'),
     path('users/<int:student_id>/delete/', views.delete_user, name='delete_user'),
+        
+    path('course/<int:course_id>/add-classroom/', views.add_course_classroom, name='add_course_classroom'),
+    path('course-classroom/<int:course_classroom_id>/delete/', views.delete_course_classroom, name='delete_course_classroom'),
 ]
